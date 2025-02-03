@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[ORM\HasLifecycleCallbacks] //Gestion des created_at et updated_at
+#[ORM\HasLifecycleCallbacks] // Gestion des created et updated
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -37,7 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $uptaded_at = null;
+    private ?\DateTimeImmutable $updated_at = null;
 
     #[ORM\Column(length: 80, nullable: true)]
     private ?string $username = null;
@@ -53,24 +53,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?bool $is_gpdr = null;
-/**
- * Constructeur pour gérer les attributs non_nullable par défaut
- */
+
+    #[ORM\OneToOne(mappedBy: 'pro', cascade: ['persist', 'remove'])]
+    private ?Detail $detail = null;
+
+    /**
+     * Constructeur pour gérer les attributs non-nullables par défaut
+     */
     public function __construct()
     {
         $this->is_minor = false;
         $this->is_terms = false;
         $this->is_gpdr = false;
     }
-#[ORM\PrePersist]
-    public function setCreatedAtValue(): void
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue()
     {
         $this->created_at = new \DateTimeImmutable();
     }
-#[ORM\PreUpdate]
-    public function setUpdatedAtValue(): void
+
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue()
     {
-        $this->uptaded_at = new \DateTimeImmutable();
+        $this->updated_at = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -160,14 +166,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getUptadedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        return $this->uptaded_at;
+        return $this->updated_at;
     }
 
-    public function setUptadedAt(\DateTimeImmutable $uptaded_at): static
+    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
     {
-        $this->uptaded_at = $uptaded_at;
+        $this->updated_at = $updated_at;
 
         return $this;
     }
@@ -231,4 +237,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getDetail(): ?Detail
+    {
+        return $this->detail;
+    }
+
+    public function setDetail(Detail $detail): static
+    {
+        // set the owning side of the relation if necessary
+        if ($detail->getPro() !== $this) {
+            $detail->setPro($this);
+        }
+
+        $this->detail = $detail;
+
+        return $this;
+    }
 }
+                    
