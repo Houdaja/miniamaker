@@ -63,6 +63,7 @@ class Detail
     #[ORM\OneToMany(targetEntity: LandingPage::class, mappedBy: 'detail')]
     private Collection $landingPages;
 
+   
     #[ORM\PrePersist]
     public function setCreatedAtValue()
     {
@@ -81,7 +82,7 @@ class Detail
         $this->portfolio_check = false;
         $this->is_banned = false;
         $this->strikes = 0;
-        $this->landingPages = new ArrayCollection();
+        //$this->landingPages = new ArrayCollection();
     }
 
     #[ORM\PrePersist]
@@ -300,5 +301,6 @@ class Detail
 
         return $this;
     }
+
 }
                     

@@ -6,6 +6,7 @@ use App\Repository\LpContentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+
 #[ORM\Entity(repositoryClass: LpContentRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 class LpContent
@@ -27,6 +28,9 @@ class LpContent
     #[ORM\Column]
     private ?\DateTimeImmutable $updated_at = null;
 
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?LandingPage $landing_page = null;
+
     #[ORM\PrePersist]
     public function setCreatedAtValue()
     {
@@ -39,10 +43,6 @@ class LpContent
     {
         $this->updated_at = new \DateTimeImmutable();
     }
-
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?LandingPage $landing_page = null;
 
     public function getId(): ?int
     {
@@ -102,7 +102,7 @@ class LpContent
         return $this->landing_page;
     }
 
-    public function setLandingPage(LandingPage $landing_page): static
+    public function setLandingPage(?LandingPage $landing_page): static
     {
         $this->landing_page = $landing_page;
 
