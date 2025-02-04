@@ -60,7 +60,7 @@ class Detail
     /**
      * @var Collection<int, LandingPage>
      */
-    #[ORM\OneToMany(targetEntity: LandingPage::class, mappedBy: 'detail')]
+    #[ORM\OneToMany(targetEntity: LandingPage::class, mappedBy: 'detail', orphanRemoval: true)]
     private Collection $landingPages;
 
    

@@ -62,6 +62,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
+    #[ORM\ManyToOne(inversedBy:'pro' )]
+    #[ORM\JoinColumn(nullable:true )]
+    private ?Subscription $subscription = null;
+
     /**
      * Constructeur pour gérer les attributs non-nullables par défaut
      */
