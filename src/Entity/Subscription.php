@@ -6,9 +6,9 @@ use App\Repository\SubscriptionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Type;
 
 #[ORM\Entity(repositoryClass: SubscriptionRepository::class)]
-#[ORM\HasLifecycleCallbacks]
 class Subscription
 {
     #[ORM\Id]
@@ -19,7 +19,7 @@ class Subscription
     #[ORM\Column]
     private ?bool $is_active = null;
 
-    #[ORM\Column]
+    #[ORM\Column (type:'decimal', precision: 7, scale: 2)]
     private ?int $amount = null;
 
     #[ORM\Column(length: 80)]
@@ -30,7 +30,6 @@ class Subscription
 
     #[ORM\Column]
     private ?\DateTimeImmutable $updated_at = null;
-
     #[ORM\PrePersist]
     public function setCreatedAtValue()
     {
