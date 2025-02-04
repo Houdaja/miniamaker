@@ -2,38 +2,40 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
+use App\Entity\User;
+use App\Entity\Promo;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
+use App\Repository\SubscriptionRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: '`user`')]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\Entity(repositoryClass: SubscriptionRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')] // Gestion des created et updated
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class Subscription
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180)]
-    private ?string $email = null;
-
     /**
-     * @var list<string> The user roles
+     * @var Collection<int, User>
      */
-    #[ORM\Column]
-    private array $roles = [];
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'subscription')]
+    private Collection $clients;
 
-    /**
-     * @var string The hashed password
-     */
     #[ORM\Column]
-    private ?string $password = null;
+    private ?bool $is_active = null;
+
+    #[ORM\Column(
+        type: 'decimal', 
+        precision: 7, // Nombre total ex. 10 000,00
+        scale: 2, // Nombre de décimales ex. 2 = 0,00
+        )]
+    private ?int $amount = null;
+
+    #[ORM\Column(length: 80)]
+    private ?string $frequency = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
@@ -41,50 +43,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?\DateTimeImmutable $updated_at = null;
 
-    #[ORM\Column(length: 80, nullable: true)]
-    private ?string $username = null;
-
-    #[ORM\Column(length: 80, nullable: true)]
-    private ?string $fullname = null;
-
-    #[ORM\Column]
-    private ?bool $is_minor = null;
-
-    #[ORM\Column]
-    private ?bool $is_terms = null;
-
-    #[ORM\Column]
-    private ?bool $is_gpdr = null;
-
-    #[ORM\OneToOne(mappedBy: 'pro', cascade: ['persist', 'remove'])]
-    private ?Detail $detail = null;
-
-    #[ORM\Column]
-    private bool $isVerified = false;
-
-    #[ORM\ManyToOne(inversedBy:'pro' )]
-    #[ORM\JoinColumn(nullable:true )]
-    private ?Subscription $subscription = null;
-
     /**
-     * Constructeur pour gérer les attributs non-nullables par défaut
+     * @var Collection<int, Promo>
      */
+    #[ORM\OneToMany(targetEntity: Promo::class, mappedBy: 'subscription')]
+    private Collection $promos;
+
     public function __construct()
     {
-        $this->is_minor = false;
-        $this->is_terms = false;
-        $this->is_gpdr = false;
+        $this->promos = new ArrayCollection();
+        $this->clients = new ArrayCollection();
+        $this->is_active = false;
+        $this->amount = 99.97;
+        $this->frequency = 'monthly';
     }
 
     #[ORM\PrePersist]
-    public function setCreatedAtValue()
+    public function prePersist(): void
     {
         $this->created_at = new \DateTimeImmutable();
         $this->updated_at = new \DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
-    public function setUpdatedAtValue()
+    public function preUpdate(): void
     {
         $this->updated_at = new \DateTimeImmutable();
     }
@@ -94,74 +76,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getEmail(): ?string
+    public function isActive(): ?bool
     {
-        return $this->email;
+        return $this->is_active;
     }
 
-    public function setEmail(string $email): static
+    public function setIsActive(bool $is_active): static
     {
-        $this->email = $email;
+        $this->is_active = $is_active;
 
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
-    public function getUserIdentifier(): string
+    public function getAmount(): ?int
     {
-        return (string) $this->email;
+        return $this->amount;
     }
 
-    /**
-     * @see UserInterface
-     *
-     * @return list<string>
-     */
-    public function getRoles(): array
+    public function setAmount(int $amount): static
     {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
-    }
-
-    /**
-     * @param list<string> $roles
-     */
-    public function setRoles(array $roles): static
-    {
-        $this->roles = $roles;
+        $this->amount = $amount;
 
         return $this;
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
-    public function getPassword(): ?string
+    public function getFrequency(): ?string
     {
-        return $this->password;
+        return $this->frequency;
     }
 
-    public function setPassword(string $password): static
+    public function setFrequency(string $frequency): static
     {
-        $this->password = $password;
+        $this->frequency = $frequency;
 
         return $this;
-    }
-
-    /**
-     * @see UserInterface
-     */
-    public function eraseCredentials(): void
-    {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable
@@ -188,93 +136,64 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getUsername(): ?string
+    /**
+     * @return Collection<int, Promo>
+     */
+    public function getPromos(): Collection
     {
-        return $this->username;
+        return $this->promos;
     }
 
-    public function setUsername(?string $username): static
+    public function addPromo(Promo $promo): static
     {
-        $this->username = $username;
-
-        return $this;
-    }
-
-    public function getFullname(): ?string
-    {
-        return $this->fullname;
-    }
-
-    public function setFullname(?string $fullname): static
-    {
-        $this->fullname = $fullname;
-
-        return $this;
-    }
-
-    public function isMinor(): ?bool
-    {
-        return $this->is_minor;
-    }
-
-    public function setIsMinor(bool $is_minor): static
-    {
-        $this->is_minor = $is_minor;
-
-        return $this;
-    }
-
-    public function isTerms(): ?bool
-    {
-        return $this->is_terms;
-    }
-
-    public function setIsTerms(bool $is_terms): static
-    {
-        $this->is_terms = $is_terms;
-
-        return $this;
-    }
-
-    public function isGpdr(): ?bool
-    {
-        return $this->is_gpdr;
-    }
-
-    public function setIsGpdr(bool $is_gpdr): static
-    {
-        $this->is_gpdr = $is_gpdr;
-
-        return $this;
-    }
-
-    public function getDetail(): ?Detail
-    {
-        return $this->detail;
-    }
-
-    public function setDetail(Detail $detail): static
-    {
-        // set the owning side of the relation if necessary
-        if ($detail->getPro() !== $this) {
-            $detail->setPro($this);
+        if (!$this->promos->contains($promo)) {
+            $this->promos->add($promo);
+            $promo->setSubscription($this);
         }
 
-        $this->detail = $detail;
+        return $this;
+    }
+
+    public function removePromo(Promo $promo): static
+    {
+        if ($this->promos->removeElement($promo)) {
+            // set the owning side to null (unless already changed)
+            if ($promo->getSubscription() === $this) {
+                $promo->setSubscription(null);
+            }
+        }
 
         return $this;
     }
 
-    public function isVerified(): bool
+    /**
+     * @return Collection<int, User>
+     */
+    public function getClients(): Collection
     {
-        return $this->isVerified;
+        return $this->clients;
     }
 
-    public function setIsVerified(bool $isVerified): static
+    public function addClient(User $client): static
     {
-        $this->isVerified = $isVerified;
+        if (!$this->clients->contains($client)) {
+            $this->clients->add($client);
+            $client->setSubscription($this);
+        }
+
+        return $this;
+    }
+
+    public function removeClient(User $client): static
+    {
+        if ($this->clients->removeElement($client)) {
+            // set the owning side to null (unless already changed)
+            if ($client->getSubscription() === $this) {
+                $client->setSubscription($this);
+            }
+        }
 
         return $this;
     }
 }
-                    
+                
