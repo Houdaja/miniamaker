@@ -6,6 +6,7 @@ use App\Repository\PromoRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PromoRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Promo
 {
     #[ORM\Id]
@@ -24,6 +25,19 @@ class Promo
 
     #[ORM\Column]
     private ?\DateTimeImmutable $update_at = null;
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue()
+    {
+        $this->created_at = new \DateTimeImmutable();
+        $this->updated_at = new \DateTimeImmutable();
+    }
+
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue()
+    {
+        $this->updated_at = new \DateTimeImmutable();
+    }
 
     #[ORM\ManyToOne(inversedBy: 'promos')]
     #[ORM\JoinColumn(nullable: false)]
