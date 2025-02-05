@@ -74,7 +74,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, LoginHistory>
      */
-    #[ORM\OneToMany(targetEntity: LoginHistory::class, mappedBy: 'user')]
+    #[ORM\OneToMany(targetEntity: LoginHistory::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $loginHistories;
 
     /**
@@ -87,6 +87,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->is_terms = false;
         $this->is_gpdr = false;
         $this->loginHistories = new ArrayCollection();
+        $this->image = "default.png";
     }
     
     #[ORM\PrePersist]
