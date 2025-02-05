@@ -25,7 +25,7 @@ final class PageController extends AbstractController
             );
         }
 
-        dd($request);
+        //dd($request);
 
         if (!$this->getUser()) {
             return $this->render('page/lp.html.twig');
