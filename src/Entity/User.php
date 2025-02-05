@@ -349,4 +349,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    public function isComplete():bool
+    {
+        if(!empty($this->username) && !empty($this->fullname) // si ce n'est pas vide
+        ){
+            return true;
+        }
+            return false;
+    }
 }
