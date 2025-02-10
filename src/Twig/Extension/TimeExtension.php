@@ -2,27 +2,43 @@
 
 namespace App\Twig\Extension;
 
-use App\Twig\Runtime\TimeExtensionRuntime;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
-use Twig\TwigFunction;
 
+/**
+ * Extension Twig pour filtrer l'affichage des dates en fonction de la date actuelle
+ */
 class TimeExtension extends AbstractExtension
 {
     public function getFilters(): array
     {
         return [
-            // If your filter generates SAFE HTML, you should add a third
-            // parameter: ['is_safe' => ['html']]
-            // Reference: https://twig.symfony.com/doc/3.x/advanced.html#automatic-escaping
-            new TwigFilter('filter_name', [TimeExtensionRuntime::class, 'doSomething']),
+            new TwigFilter('time_diff', [$this, 'getTimeDiff']),
         ];
     }
 
-    public function getFunctions(): array
+    public function getTimeDiff(\DateTimeInterface $date): string
     {
-        return [
-            new TwigFunction('function_name', [TimeExtensionRuntime::class, 'doSomething']),
-        ];
+        $now = new \DateTimeImmutable();
+        $diff = $date->diff($now);
+    
+        if ($diff->y > 0) {
+            return $diff->y . ' année' . ($diff->d > 1 ? 's' : '');
+        }
+    
+        if ($diff->m > 0) {
+            return $diff->m . ' mois';
+        }
+    
+        if ($diff->d > 0) {
+            return $diff->d . ' jour' . ($diff->d > 1 ? 's' : '');
+        }
+    
+        if ($diff->h > 0) {
+            return $diff->h . ' heure' . ($diff->h > 1 ? 's' : '');
+        }
+    
+        return $diff->i . ' minute' . ($diff->i > 1 ? 's' : '');
     }
 }
+                    
