@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Entity\Utilisateur;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -35,9 +35,9 @@ class AddUserCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $user = new Utilisateur();
+        $user = new User();
         $user->setEmail('hello@admin.com');
-        $user->setRoles(['ROLE_ADMIN']);
+        $user->setRoles(["ROLE_ADMIN"]);
 
         $plaintextPassword = '@dmi!n2025';
         $hashedPassword = $this->passwordHasher->hashPassword(
