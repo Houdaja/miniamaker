@@ -14,7 +14,7 @@ final class Salutation
     //return 'Bonjour' . $this->name;
 
     $hour = (int) date('H');
-    if ($hour <= 5 && $hour < 18){
+    if ($hour >= 5 && $hour < 18){
       return 'Bonjour'; 
     } elseif ($hour >= 18 && $hour <23){
       return 'Bonsoir';
