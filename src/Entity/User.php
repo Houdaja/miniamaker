@@ -367,3 +367,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return false;
     }
 }
+                    
