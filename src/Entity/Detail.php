@@ -5,11 +5,10 @@ namespace App\Entity;
 use App\Repository\DetailRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DetailRepository::class)]
-#[ORM\HasLifecycleCallbacks] 
+#[ORM\HasLifecycleCallbacks]
 class Detail
 {
     #[ORM\Id]
@@ -26,7 +25,7 @@ class Detail
     #[ORM\Column(length: 255)]
     private ?string $address = null;
 
-    #[ORM\Column(length: 80)]
+    #[ORM\Column(length: 255)]
     private ?string $city = null;
 
     #[ORM\Column(length: 80)]
@@ -41,8 +40,8 @@ class Detail
     #[ORM\Column]
     private ?bool $portfolio_check = null;
 
-    #[ORM\Column(type: Types::BIGINT)]
-    private ?string $strikes = null;
+    #[ORM\Column]
+    private ?int $strikes = null;
 
     #[ORM\Column]
     private ?bool $is_banned = null;
@@ -52,10 +51,10 @@ class Detail
     private ?User $pro = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $updated_at = null;
+    private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
+    private ?\DateTimeImmutable $updated_at = null;
 
     /**
      * @var Collection<int, LandingPage>
@@ -63,35 +62,24 @@ class Detail
     #[ORM\OneToMany(targetEntity: LandingPage::class, mappedBy: 'detail', orphanRemoval: true)]
     private Collection $landingPages;
 
-   
+    public function __construct()
+    {
+        $this->country = "FR" ;
+        $this->portfolio_check = false;
+        $this->strikes = 0;
+        $this->is_banned = false;
+        $this->landingPages = new ArrayCollection();
+    }
+
     #[ORM\PrePersist]
     public function setCreatedAtValue()
     {
         $this->created_at = new \DateTimeImmutable();
+        $this->updated_at = new \DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
     public function setUpdatedAtValue()
-    {
-        $this->updated_at = new \DateTimeImmutable();
-    }
-
-    public function __construct()
-    {
-        $this->country = 'Fr';
-        $this->portfolio_check = false;
-        $this->is_banned = false;
-        $this->strikes = 0;
-        //$this->landingPages = new ArrayCollection();
-    }
-
-    #[ORM\PrePersist]
-    public function setCreatedValue(): void
-    {
-        $this->created_at = new \DateTimeImmutable();
-    }
-    #[ORM\PreUpdate]
-    public function updateTimestamps(): void
     {
         $this->updated_at = new \DateTimeImmutable();
     }
@@ -128,8 +116,8 @@ class Detail
     public function getFullAddress(): ?string
     {
         return $this->address . 
-        ', ' . $this->city . 
-        ' ' . $this->postal_code . 
+        ', ' . $this->postal_code . 
+        ' ' . $this->city . 
         ', ' . $this->country;
     }
 
@@ -205,12 +193,12 @@ class Detail
         return $this;
     }
 
-    public function getStrikes(): ?string
+    public function getStrikes(): ?int
     {
         return $this->strikes;
     }
 
-    public function setStrikes(string $strikes): static
+    public function setStrikes(int $strikes): static
     {
         $this->strikes = $strikes;
 
@@ -223,7 +211,7 @@ class Detail
     }
 
     public function setIsBanned(): static
-    {   
+    {
         if($this->strikes > 1) {
             $this->is_banned = true;
         }
@@ -242,18 +230,6 @@ class Detail
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
-    {
-        $this->updated_at = $updated_at;
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->created_at;
@@ -266,8 +242,20 @@ class Detail
         return $this;
     }
 
-    // INDISPENSABLE 
-    public function __toString(): string
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
+    {
+        $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    // Indispensable
+    public function __toString()
     {
         return $this->company_name;
     }
@@ -301,6 +289,4 @@ class Detail
 
         return $this;
     }
-
 }
-                    
