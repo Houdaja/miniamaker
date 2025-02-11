@@ -12,10 +12,8 @@ final class LandingPageController extends AbstractController
     public function add(): Response
     {   
         $user = $this->getUser();
-        if(
-            !in_array('ROLE_AGENT', $user->getRoles()) ||
-            !in_array('ROLE_PRO', $user->getRoles())
-            ){
+        if(!$user->hasRole('ROLE_PRO') || !$user->hasRole('ROLE_AGENT'))
+            {
                 return $this->redirectToRoute('app_detail');
         }
         return $this->render('landing_page/index.html.twig', [
