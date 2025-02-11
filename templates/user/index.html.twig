@@ -68,10 +68,10 @@
                                 </div>
                                 <div class="card-body">
                                     <p class="mb-3">
-                                        {{ app.user.subscription.name ?? 'Aucune landing pages actuellement' }}
+                                        {{ app.user.detail.landingPages.name ?? 'Aucune landing pages actuellement' }}
                                     </p>
-                                    {% if app.user.subscription is null %}
-                                        <a href="#" class="btn btn-primary">Créer une page</a>
+                                    {% if app.user.detail.landingPages|length == 0 %}
+                                        <a href="{{ path('lp_add') }}" class="">Créer une page</a>
                                     {% endif %}
                                 </div>
                             </div>
