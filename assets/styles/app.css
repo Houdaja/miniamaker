@@ -13,9 +13,21 @@ body {
   font-family: "Inter Tight", sans-serif;
   letter-spacing: 0.02rem;
   line-height: 1.5;
-  background-color: #f8f9fa;
-  background-image: url("/medias/images/bg.svg");
-  background-size: cover;
+  background: #f8fafc;
+}
+
+.indigo-200 {
+  color: #c7d2fe;
+}
+.fuschia-200 {
+  color: #f5d0fe;
+}
+
+.bg-indigo-200 {
+  background-color: #c7d2fe;
+}
+.bg-fuschia-200 {
+  background-color: #f5d0fe;
 }
 
 /* Layout */
@@ -38,6 +50,10 @@ body {
 .center {
   display: grid;
   place-items: center;
+}
+
+.mx-end {
+  align-self: flex-end;
 }
 
 /* Typography */
@@ -66,6 +82,15 @@ h6 {
 /* Components */
 .card {
   border: 0;
+}
+
+.bubble {
+  border-radius: 1rem;
+  padding: 1rem 2rem;
+  margin-bottom: 0.25rem;
+  border-radius: 0.5rem;
+  max-width: 50%;
+  width: fit-content;
 }
 
 .add {
