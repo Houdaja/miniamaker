@@ -17,9 +17,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class PaymentService extends AbstractService
 {
     public function __construct(
-        private readonly ParameterBagInterface $params,
-        private readonly SubscriptionRepository $sr,
-        private readonly EntityManagerInterface $em,
+        private ParameterBagInterface $params,
+        private SubscriptionRepository $sr,
+        private EntityManagerInterface $em,
     ) 
     {
         $this->params = $params;
@@ -38,6 +38,7 @@ class PaymentService extends AbstractService
             ->setAmount($amount)
             ->setFrequency($amount > 99 ? $this->params->get('STRIPE_SUB_ANNUALLY') : $this->params->get('STRIPE_SUB_MONTHLY'))
         ;
+        dd($subscription);
     }
 }
                     
