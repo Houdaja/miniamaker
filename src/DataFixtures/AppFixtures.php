@@ -46,10 +46,10 @@ class AppFixtures extends Fixture
             $nom = $faker->name();
             $prenom = $faker->firstName();
             $fullname = $prenom . ' ' . $nom;
-            $sluggy = $this->slugger->slug($fullname);
+            $sluggy = strtolower($this->slugger->slug($fullname));
 
             $user = new User();
-            $user->setEmail($sluggy . $faker->freeEmailDomain());
+            $user->setEmail($sluggy . '@' . $faker->freeEmailDomain());
             $user->setRoles(['ROLE_AGENT']);
             $user->setPassword($this->passwordHasher->hashPassword($user, 'password123'));
             $user->setUsername($this->slugger->slug($prenom));
@@ -67,10 +67,10 @@ class AppFixtures extends Fixture
             $nom = $faker->name();
             $prenom = $faker->firstName();
             $fullname = $prenom . ' ' . $nom;
-            $sluggy = $this->slugger->slug($fullname);
+            $sluggy = strtolower($this->slugger->slug($fullname));
 
             $user = new User();
-            $user->setEmail($sluggy . $faker->freeEmailDomain());
+            $user->setEmail($sluggy . '@' . $faker->freeEmailDomain());
             $user->setRoles(['ROLE_AGENT']);
             $user->setPassword($this->passwordHasher->hashPassword($user, 'password123'));
             $user->setUsername($this->slugger->slug($prenom));
@@ -138,53 +138,55 @@ class AppFixtures extends Fixture
         $admin->setEmail('admin@admin.com');
         $admin->setRoles(['ROLE_ADMIN']);
         $admin->setPassword($this->passwordHasher->hashPassword($admin, 'admin123'));
-        $admin->setUsername('admin');
-        $admin->setFullname('Admin User');
+        $admin->setUsername('Martine');
+        $admin->setFullname('Admin Martine');
         $admin->setIsMajor(true);
         $admin->setIsTerms(true);
         $admin->setIsGpdr(true);
         $admin->setIsVerified(true);
         
         $manager->persist($admin);
+        
+        // Créer un admin
+        $admin2 = new User();
+        $admin2->setEmail('admin2@admin.com');
+        $admin2->setRoles(['ROLE_ADMIN']);
+        $admin2->setPassword($this->passwordHasher->hashPassword($admin, 'admin123'));
+        $admin2->setUsername('Martin');
+        $admin2->setFullname('Admin Martin');
+        $admin2->setIsMajor(true);
+        $admin2->setIsTerms(true);
+        $admin2->setIsGpdr(true);
+        $admin2->setIsVerified(true);
+        
+        $manager->persist($admin2);
 
-  
-    }     
 
-}
+        // Conversion en 2 user
 
-$admin2 = new User();
-$admin2->setEmail('admin2@admin.com');
-$admin2->setRoles(['ROLE_ADMIN']);
-$admin2->setPassword($this->passwordHasher->hashPassword($admin, 'admin123'));
-$admin2->setUsername('admin');
-$admin2->setFullname('Admin Martin');
-$admin2->setIsMajor(true);
-$admin2->setIsTerms(true);
-$admin2->setIsGpdr(true);
-$admin2->setIsVerified(true);
-
-$manager->persist($admin);
-
-$discussion = new Discussion();
-$discussion
-    ->setSender($admin)
-    ->setReceiver($admin2)
-    ->setSubject($admin->getUsername() . 'x' . $admin2->getUsername() )
-    ->setIsArchive($admin)
-    ->setCreatedAt(new \DateTimeImmutable())
-    ;
-
-    $manager->persist($discussion);
-
-    for($i = 0; $i <10; $i++){
-        $message = new Message();
-        $message
-            ->setDiscussion($discussion)
-            ->setUser($i % 2  === 0 ? $admin : $admin2)
-            ->setContent($faker->sentence(10))
-            ->setStatus(true)
+        $discussion = new Discussion();
+        $discussion
+            ->setSender($admin)
+            ->setReceiver($admin2)
+            ->setSubject($admin->getUsername() . ' x ' . $admin2->getUsername())
+            ->setIsArchive(false)
             ->setCreatedAt(new \DateTimeImmutable())
             ;
-    }
+            $manager->persist($discussion);
 
-    $manager->flush();
+            for($i = 0; $i < 10; $i++) {
+                $message = new Message();
+                $message
+                    ->setDiscussion($discussion)
+                    ->setUser($i % 2 === 0 ? $admin : $admin2)
+                    ->setContent($faker->sentence(10))
+                    ->setStatus(true)
+                    ->setCreatedAt(new \DateTimeImmutable())
+                    ;
+
+                $manager->persist($message);
+            }
+
+        $manager->flush();
+    }
+}

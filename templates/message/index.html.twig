@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste de vos discussions{% endblock %}
+
+{% block body %}
+<div class="container center mt-5">
+    <h1 class="text-center">Liste de vos discussions</h1>
+    <table class="table table-stripped bg-white rounded-lg shadow-sm">
+        <tr>
+            <th class="">Avec</th>
+            <th class="">Sujet</th>
+            <th class="">Date</th>
+        </tr>
+        <tbody class="px-2">
+            {% for item in app.user.discussions %}
+            <tr class= "">
+                <td class= "">
+                    <img src= "{{ asset('medias/images/default.png') }}" alt= "{{ item.subject}}" with="25">
+                </td>
+                <td class="">
+                    <p class="fs-5 fw-bold"> {{ item.subject }}</p>
+                    <p class= "help text-secondary"> {{ item.messages|length }} messages</p>
+                </td>
+                <td class="help text-secondary">
+                    {{ item.createdAT|time_diff}}                
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+    {# {{ dump(item) }}
+    <hr>
+        {% for message in item.messages %}
+            {{ dump(message) }}
+        {% endfor %}
+    <br> #}
+{% endfor %}
+
+{% endblock %}
+                    
