@@ -1,40 +1,38 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste de vos discussions{% endblock %}
+{% block title %}Liste de vos disscusions{% endblock %}
 
 {% block body %}
+
 <div class="container center mt-5">
-    <h1 class="text-center">Liste de vos discussions</h1>
-    <table class="table table-stripped bg-white rounded-lg shadow-sm">
-        <tr>
+    <h1 class="text-center">Liste de vos disscusions</h1>
+
+    <table class="table bg-white rounded-lg shadow-sm">
+        <tr class="">
             <th class="">Avec</th>
             <th class="">Sujet</th>
             <th class="">Date</th>
         </tr>
-        <tbody class="px-2">
+        <tbody>
             {% for item in app.user.discussions %}
-            <tr class= "">
-                <td class= "">
-                    <img src= "{{ asset('medias/images/default.png') }}" alt= "{{ item.subject}}" with="25">
-                </td>
-                <td class="">
-                    <p class="fs-5 fw-bold"> {{ item.subject }}</p>
-                    <p class= "help text-secondary"> {{ item.messages|length }} messages</p>
-                </td>
-                <td class="help text-secondary">
-                    {{ item.createdAT|time_diff}}                
-                </td>
-            </tr>
+                <tr class="">
+                    <td class="">
+                        <img src="{{ asset('medias/images/default.png') }}" alt="{{ item.subject }}" width="25">
+                    </td>
+                    <td class="">
+                        <a href="{{ path('app_message_show', { id: item.id }) }}" class="text-danger text-decoration-none">
+                            <p class="fs-5 fw-bold">{{ item.subject }}</p>
+                        </a>
+                        <p class="help text-secondary">{{ item.messages|length  }} messages</p>
+                    </td>
+                    <td class="help text-secondary">
+                        {{ item.createdAt|time_diff }}
+                    </td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
-    {# {{ dump(item) }}
-    <hr>
-        {% for message in item.messages %}
-            {{ dump(message) }}
-        {% endfor %}
-    <br> #}
-{% endfor %}
+
 
 {% endblock %}
-                    
