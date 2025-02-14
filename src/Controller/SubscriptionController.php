@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\PaymentService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,16 +17,30 @@ final class SubscriptionController extends AbstractController
     #[Route('/subscription', name: 'app_subscription', methods: ['POST'])]
     public function subscription(Request $request, PaymentService $ps): RedirectResponse
     {
-        try {
-            $subscription = $this->getUser()->getSubscription();
+        private Subscription $subscription;
+/*************  ✨ Codeium Command ⭐  *************/
+/**
+ * Constructor for SubscriptionController.
+ *
+ * @param EntityManagerInterface $em The entity manager interface used for database operations.
+ */
 
-            if ($subscription == null || $subscription->isActive() === false) {
+/******  93158f3f-2bb4-4843-b324-d4b53839a24e  *******/
+        public function __construct(
+            private EntityManagerInterface $em
+        )
+        {
+            $this->subscription = $this->getUser()->getSubscription();
+            
+        }
+        try {
+            if ($this->subscription == null || $subscription->isActive() === false) {
                 $checkoutUrl = $ps->setPayment(
                     $this->getUser(),
                     intval($request->get('plan'))
                 );
                 return $this->redirectToRoute('app_subscription_check', ['link' => $checkoutUrl]);
-                // return new RedirectResponse($checkoutUrl);
+            
             }
 
             $this->addFlash('warning', "Vous êtes déjà abonné(e)");
