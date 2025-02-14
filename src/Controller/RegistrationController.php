@@ -24,7 +24,7 @@ class RegistrationController extends AbstractController
     {
     }
 
-    #[Route('/inscription', name: 'app_register')]
+    #[Route('/inscription', name: 'app_register', methods: ['GET'])]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, Security $security, EntityManagerInterface $entityManager): Response
     {
         // Si déjà connecté, on redirige
@@ -89,7 +89,6 @@ class RegistrationController extends AbstractController
             return $this->redirectToRoute('app_register');
         }
 
-        // @TODO Change the redirect on success and handle or remove the flash message in your templates
         $this->addFlash('success', 'Votre adresse e-mail à bien été vérifiée. Merci.');
 
         return $this->redirectToRoute('app_profile');
